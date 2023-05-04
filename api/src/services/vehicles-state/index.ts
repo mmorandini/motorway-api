@@ -14,6 +14,8 @@ export class VehiclesStateService {
     }
 
     async get(props: { vehicleId: number; timestamp: string }): Promise<QueryResult<Vehicle>> {
+
+        // Connect to db
         let db: PoolClient;
         try {
             db = await this.db.connect();
@@ -21,6 +23,8 @@ export class VehiclesStateService {
             this.logger.error(e);
             throw new Error('Database error');
         }
+
+        // Define SQL query
         const query = `
 SELECT vehicles.*, "stateLogs".state
 FROM vehicles
@@ -33,7 +37,11 @@ INNER JOIN (
 ) "stateLogs" ON vehicles.id = "stateLogs"."vehicleId"
 WHERE vehicles.id = $2;
             `;
+
+        // Define query parameters
         const values = [props.timestamp, props.vehicleId];
+
+        // Return queryResult as promise
         return db.query(query, values)
             .catch((error) => {
                 this.logger.error(error);

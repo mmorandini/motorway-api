@@ -12,7 +12,7 @@ export class VehiclesStateController {
         this.logger = logger
     }
 
-    // FETCH
+    // Fetch resource via vehiclesStateService
     async fetch(props: {vehicleId: number, timestamp: string}): Promise<Vehicle[]> {
         this.logger.info(`Fetch vehicle state: ${JSON.stringify(props)}`);
         const { rows } = await this.vehicleStateService.get(props);

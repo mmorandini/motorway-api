@@ -18,6 +18,7 @@ class Routes {
     }
 
     private routes(): void {
+        // Delegate all vehicle-state routing to child router
         this.express.use('/vehicle-state', VehiclesState);
     }
 }

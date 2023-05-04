@@ -20,20 +20,25 @@ export class Redis {
         this.redisCache.on('error', err => this.logger.error('Redis Client Error: ' + err.message));
     }
 
+    // Get function, takes a key (url) and a fetcher function to be used if cache is unable to provide the resource
     async get<T>(key: string, fn: () => Promise<T>): Promise<T> {
+
+        // Connect to redis instance
         await this.redisCache.connect();
 
+        // Disconnect and invoke fetcher function if redis isn't ready
         if (!this.redisCache.isReady) {
             this.logger.debug('Redis not ready');
             await this.redisCache.disconnect();
             return await fn();
         }
 
-        const redisResponse = await this.redisCache.get(<any>key).catch(async e => {
-            this.logger.error('Redis get error: ' + e.message || JSON.stringify(e));
-            await this.redisCache.disconnect();
-            throw new Error(e);
-        });
+        const redisResponse = await this.redisCache.get(<any>key)
+            .catch(async e => {
+                this.logger.error('Redis get error: ' + e.message || JSON.stringify(e));
+                await this.redisCache.disconnect();
+                throw new Error(e);
+            });
 
         if (redisResponse) {
             await this.redisCache.disconnect();
@@ -49,7 +54,7 @@ export class Redis {
                 <any>key,
                 <any>JSON.stringify(result),
                 <any>{'EX': this.exp}
-            ).catch( async e => {
+            ).catch(async e => {
                 await this.redisCache.disconnect();
                 this.logger.debug('Redis set error: ' + e.message || JSON.stringify(e));
                 throw new Error(e);

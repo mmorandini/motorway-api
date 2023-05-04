@@ -10,24 +10,25 @@ const service: VehiclesStateService = new VehiclesStateService();
 const vehiclesStateController: VehiclesStateController = new VehiclesStateController(service, logger);
 const redis: Redis = new Redis(60);
 
-// Get vehicle by id
+// Get vehicle state by id and timestamp
 app.get('/:vehicleId/:timestamp', async (req, res) => {
     const {vehicleId, timestamp} = req.params;
     const parsedTimestamp = Date.parse(timestamp);
     const vehicleIdAsNumber = Number(vehicleId);
 
-    // Check if the timestamp is valid
+    // Check that timestamp is valid
     if (isNaN(parsedTimestamp)) {
         return res.status(400).json({ error: 'Invalid timestamp' });
     }
 
+    // Check that vehicle id is a valid number
     if (isNaN(vehicleIdAsNumber)) {
         return res.status(400).json({ error: 'Invalid id' });
     }
 
 
-
     try {
+        // fetch resource via caching service
         const payload = await redis.get(
             req.originalUrl || req.url,
             () => vehiclesStateController.fetch({vehicleId: vehicleIdAsNumber, timestamp})
