@@ -8,7 +8,7 @@ To initialize it, run `docker compose up` from the root of this project, this wi
 
 By default, the database runs on port `5432` and is also exposed on `5432`, if you want to change this you can update `docker-compose.yml`.
 
-The api will be running on port `3070`, and the endpoint to test is /api/vehicle_state/:vehicleId/:timestamp.
+The api will be running on port `3070`, and the endpoint to test is `/api/vehicle_state/:vehicleId/:timestamp`.
 
 \
 \
